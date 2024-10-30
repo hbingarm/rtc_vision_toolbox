@@ -10,3 +10,12 @@
 	path = models/taxpose
 	url = https://github.com/cmu-mfi/taxpose.git
 	branch = rtc-taxpose
+[submodule "device-interfaces/motoman_ros1"]
+	path = device-interfaces/motoman_ros1
+	url = https://github.com/cmu-mfi/motoman_ros1.git
+[submodule "device-interfaces/realsense-ros1-docker"]
+	path = device-interfaces/realsense-ros1-docker
+	url = https://github.com/cmu-mfi/realsense-ros1-docker.git
+[submodule "device-interfaces/rosbridge_suite"]
+	path = device-interfaces/rosbridge_suite
+	url = https://github.com/cmu-mfi/rosbridge_suite.git

@@ -1,15 +1,15 @@
-import glob
-import os
-import re
+# import glob
+# import os
+# import re
 
-import cv2
+# import cv2
 import numpy as np
 import open3d as o3d
-import plotly.express as px
+# import plotly.express as px
 import plotly.graph_objs as go
 from scipy.spatial.transform import Rotation as R
 
-from camera.zed_ros.zed_ros import ZedRos
+# from camera.zed_ros.zed_ros import ZedRos
 
 def plot_multi_np(plist):
     """
@@ -86,13 +86,14 @@ def plot_multi_np(plist):
     
     fig.show()
     
-# pcd = o3d.io.read_point_cloud('/home/mfi/repos/rtc_vision_toolbox/data/demonstrations/09-11-usb/teach_data/pcd_data/demo0_ih_camera_view0_cam3_gripper_pointcloud.ply')
+file = input("Enter .ply file path: ")
+pcd = o3d.io.read_point_cloud(file)
 # pcd = o3d.io.read_point_cloud('/home/mfi/repos/rtc_vision_toolbox/camera/rs_ros/points_came_igev_0911_1630.ply')
 # pcd = o3d.io.read_point_cloud('/home/mfi/repos/rtc_vision_toolbox/data/demonstrations/09-08-dsub/teach_data/pcd_data/demo0_gripper_close_up_view0_cam2_closeup_pointcloud.ply')
 # pcd = pcd.uniform_down_sample(35)
-# points = np.asarray(pcd.points)
+points = np.asarray(pcd.points)
 
-points = np.load("/home/mfi/repos/rtc_vision_toolbox/test/demo0_anchor_og.npy")
+# points = np.load("/home/rtc-demo/rtc_repos/rtc_vision_toolbox/camera/zed_ros/tests/points_zedx_igev_1031_0946.ply")
 # points = points[np.where(points[:, 2] < 200)]
 # points[:,2] = -points[:,2]
 plot_multi_np([points])

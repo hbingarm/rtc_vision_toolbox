@@ -320,7 +320,7 @@ class TeachPlace:
                     img_folder, f"demo{self.current_demo}_{robot_state}_depth_data.npy"), depth_data)
 
             # get pcd folder
-            pcd_folder = os.path.join(data_dir, "pcd_data", cam_name)
+            pcd_folder = os.path.join(data_dir, "pcd_data")
             if not os.path.exists(pcd_folder):
                 os.makedirs(pcd_folder)
 

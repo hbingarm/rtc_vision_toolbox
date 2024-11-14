@@ -73,8 +73,8 @@ def test6(camera):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Test script for ZedRos class")
-    parser.add_argument("--camera_node", type=str,default="/cam0/zed_cam0", help="Camera node name")
-    parser.add_argument("--camera_type", type=str,default="zedx", help="Camera type (like zedx, zedxm)")
+    parser.add_argument("--camera_node", type=str, default="/cam2/zed_cam2", help="Camera node name")
+    parser.add_argument("--camera_type", type=str, default="zedx", help="Camera type (like zedx, zedxm)")
     parser.add_argument("--test", type=int, help="Test number (1-6)")
     return parser.parse_args()
 
@@ -97,20 +97,20 @@ if __name__ == "__main__":
         print("4. Get default point cloud")
         print("5. Get IGEV depth image")
         print("6. Get IGEV point cloud")
-        test = input("Enter test number (1-6): ")
+        test = int(input("Enter test number (1-6): "))
 
     match test:
-        case "1":
+        case 1:
             test1(camera)
-        case "2":
+        case 2:
             test2(camera)
-        case "3":
+        case 3:
             test3(camera)
-        case "4":
+        case 4:
             test4(camera)
-        case "5":
+        case 5:
             test5(camera)
-        case "6":
+        case 6:
             test6(camera)
         case _:
             print("Invalid test number")

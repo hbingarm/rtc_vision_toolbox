@@ -92,31 +92,31 @@ if __name__ == "__main__":
     camera = RsRos(camera_node=args.camera_node, camera_type="d405",
                    rosmaster_ip=args.rosmaster_ip, debug=True)
 
-    if args.test is not None:
+    if args.test:
         test = args.test
     else:
-        print("Suggestion: Use --test option to specify test number")
+        print("Suggestion: Use --test option to specify test number")        
         print("Available tests: ")
-        print("1. Get RGB/DEPTH/INFRA intrinsics")
+        print("1. Get RGB/DEPTH intrinsics")
         print("2. Get RGB image")
         print("3. Get default depth image")
         print("4. Get default point cloud")
         print("5. Get IGEV depth image")
         print("6. Get IGEV point cloud")
-        test = input("Enter test number (1-6): ")
+        test = int(input("Enter test number (1-6): "))
 
     match test:
-        case "1":
+        case 1:
             test1(camera)
-        case "2":
+        case 2:
             test2(camera)
-        case "3":
+        case 3:
             test3(camera)
-        case "4":
+        case 4:
             test4(camera)
-        case "5":
+        case 5:
             test5(camera)
-        case "6":
+        case 6:
             test6(camera)
         case _:
             print("Invalid test number")

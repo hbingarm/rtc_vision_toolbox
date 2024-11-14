@@ -63,12 +63,13 @@ class TeachPlace:
         print("SETUP: 2. GO TO A PLACE POSE")
         print("####################################################################")
 
-        print("Move to placement pose.")
-        input("Press Enter to close gripper and continue...")
+        # print("Move to placement pose.")
+        # input("Press Enter to close gripper and continue...")
 
-        placement_pose = self.devices.robot_get_eef_pose()
+        # placement_pose = self.devices.robot_get_eef_pose()
 
-        time.sleep(0.5)
+        # time.sleep(0.5)
+        placement_pose = self.teach_pose("placement")
         
         print("####################################################################")
         print("SETUP: 3. PULL UP AND INSERT AGAIN")

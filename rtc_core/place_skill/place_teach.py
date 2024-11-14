@@ -49,6 +49,7 @@ class TeachPlace:
         """
         Collects demonstration data for object placement.
         """
+        breakpoint()
 
         print(f"COLLECTING PLACE DEMONSTRATION DATA FOR {self.object.upper()}")
 
@@ -295,49 +296,37 @@ class TeachPlace:
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)        
         
-        max_depth = 1500
-        if "gripper_close_up" in robot_state or "ih_camera_view" in robot_state:
-            max_depth = 305  # 254 mm = 10 inches, 305 mm = 12 inches
+        max_depth = 305  # 254 mm = 10 inches, 305 mm = 12 inches
 
-            # Collect data from cameras
-            for cam_name in self.cam_keys:
-                print(f"Collecting data from {cam_name}...")
-                image = self.devices.cam_get_rgb_image(cam_name)
-                depth_data = self.devices.cam_get_raw_depth_data(
-                    cam_name, max_depth=max_depth)
-                depth_image = self.devices.cam_get_colormap_depth_image(
-                    cam_name, max_depth=max_depth)
-                point_cloud = self.devices.cam_get_point_cloud(
-                    cam_name, max_mm=max_depth)
+        # Collect data from cameras
+        for cam_name in self.cam_keys:
+            print(f"Collecting data from {cam_name}...")
+            image =         self.devices.cam_get_rgb_image(cam_name)
+            depth_data =    self.devices.cam_get_raw_depth_data(cam_name, max_depth=max_depth)
+            depth_image =   self.devices.cam_get_colormap_depth_image(cam_name, max_depth=max_depth)
+            point_cloud =   self.devices.cam_get_point_cloud(cam_name, max_mm=max_depth)
 
-                # save images in img folder
-                img_folder = os.path.join(data_dir, "img_data")
-                if not os.path.exists(img_folder):
-                    os.makedirs(img_folder)
-                cv2.imwrite(
-                    os.path.join(
-                        img_folder, f"demo{self.current_demo}_{robot_state}_{cam_name}_rgb.png"), image
-                )
-                cv2.imwrite(
-                    os.path.join(
-                        img_folder, f"demo{self.current_demo}_{robot_state}_{cam_name}_depth.png"),
-                    depth_image,
-                )
-                np.save(
-                    os.path.join(
-                        img_folder, f"demo{self.current_demo}_{robot_state}_{cam_name}_depth_data.npy"),
-                    depth_data,
-                )
+            # get img folder
+            img_folder = os.path.join(data_dir, "img_data", cam_name)
+            if not os.path.exists(img_folder):
+                os.makedirs(img_folder)
+            
+            # save images in img folder
+            cv2.imwrite(os.path.join(
+                    img_folder, f"demo{self.current_demo}_{robot_state}_rgb.png"), image)
+            cv2.imwrite(os.path.join(
+                    img_folder, f"demo{self.current_demo}_{robot_state}_depth.png"), depth_image)
+            np.save(os.path.join(
+                    img_folder, f"demo{self.current_demo}_{robot_state}_depth_data.npy"), depth_data)
 
-                # save point cloud in pcd folder
-                pcd_folder = os.path.join(data_dir, "pcd_data")
-                if not os.path.exists(pcd_folder):
-                    os.makedirs(pcd_folder)
-                o3d.io.write_point_cloud(
-                    os.path.join(
-                        pcd_folder, f"demo{self.current_demo}_{robot_state}_{cam_name}_pointcloud.ply"),
-                    point_cloud,
-                )
+            # get pcd folder
+            pcd_folder = os.path.join(data_dir, "pcd_data", cam_name)
+            if not os.path.exists(pcd_folder):
+                os.makedirs(pcd_folder)
+
+            # save pcd data in folder
+            o3d.io.write_point_cloud(os.path.join(
+                    pcd_folder, f"demo{self.current_demo}_{robot_state}_pointcloud.ply"), point_cloud,)
 
         # Collect data from robot
         eef_pose = self.devices.robot_get_eef_pose()

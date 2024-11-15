@@ -157,6 +157,7 @@ class ZedRos:
             method = self.__depth_mode
 
         depth_data = self.get_raw_depth_data(max_depth=max_depth, method=method, use_new_frame=use_new_frame)
+        depth_data = depth_data.astype(np.float64)
 
         depth_image = cv2.normalize(depth_data, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 
@@ -181,6 +182,7 @@ class ZedRos:
             method = self.__depth_mode
 
         depth_image = self.get_raw_depth_data(method=method, use_new_frame=use_new_frame)        
+        depth_image = depth_image.astype(np.float64)
         depth_image = np.where((depth_image > min_depth) & (depth_image < max_depth),
                             depth_image, 0)
         depth_image = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
@@ -626,7 +628,7 @@ class ZedRos:
 
         args = self.__get_default_IGEV_args()        
         model = torch.nn.DataParallel(IGEVStereo(args), device_ids=[0])
-        script_directory = os.path.dirname(os.path.abspath(sys.argv[0])) 
+        script_directory = os.path.dirname(__file__)
         model.load_state_dict(torch.load(os.path.join(script_directory, args.restore_ckpt)))
         model = model.module
         model.to('cuda')
@@ -654,17 +656,17 @@ class ZedRos:
             image1, image2 = padder.pad(image1, image2)
             start = time.time()
 
-            igev_disp, disp_prob = model(image1, image2, iters=32, test_mode=True)
+            igev_disp = model(image1, image2, iters=32, test_mode=True)
             end = time.time()
             if self.debug:
                 print("torch inference time: ", end - start)
             igev_disp = igev_disp.cpu().numpy()
             igev_disp = padder.unpad(igev_disp)
             igev_disp = igev_disp.squeeze()
-            disp_prob = disp_prob.cpu().numpy()
-            disp_prob = padder.unpad(disp_prob)
-            disp_prob = disp_prob.squeeze()
-            disp_prob = np.float32( disp_prob / 4 )
+            # disp_prob = disp_prob.cpu().numpy()
+            # disp_prob = padder.unpad(disp_prob)
+            # disp_prob = disp_prob.squeeze()
+            # disp_prob = np.float32( disp_prob / 4 )
             
             igev_disp = np.float32( igev_disp )    
             
@@ -673,7 +675,7 @@ class ZedRos:
             igev_disp[np.where(igev_disp == 0)] = None      
             igev_disp[np.where(igev_disp == float('inf'))] = None
             
-            np.save("disp_prob.npy", disp_prob)
+            # np.save("disp_prob.npy", disp_prob)
             
             if self.debug:
                 print("::::::IGEV estimation finished::::::")                

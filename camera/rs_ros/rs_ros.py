@@ -1,3 +1,4 @@
+import os
 import base64
 import math
 import struct
@@ -649,7 +650,8 @@ class RsRos:
 
         args = self.__get_default_IGEV_args()        
         model = torch.nn.DataParallel(IGEVStereo(args), device_ids=[0])
-        model.load_state_dict(torch.load(args.restore_ckpt))
+        script_directory = os.path.dirname(__file__)
+        model.load_state_dict(torch.load(os.path.join(script_directory, args.restore_ckpt)))
         model = model.module
         model.to('cuda')
         model.eval()
@@ -815,7 +817,7 @@ class RsRos:
         # args = parser.parse_args()
         
         class args:
-            restore_ckpt = '/home/rtc-demo/rtc_repos/rtc_vision_toolbox/camera/zed_ros/IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'
+            restore_ckpt = '../zed_ros/IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'
             save_numpy = False
             left_imgs = "./demo-imgs/*/im0.png"
             right_imgs = "./demo-imgs/*/im1.png"

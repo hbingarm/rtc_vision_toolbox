@@ -1,5 +1,8 @@
 import argparse
 
+import os
+import sys
+
 import cv2
 import numpy as np
 
@@ -10,17 +13,15 @@ from camera.rs_ros.rs_ros import RsRos
 def test1(camera):
     rgb_intrinsics = camera.get_rgb_intrinsics()
     depth_intrinsics = camera.get_depth_intrinsics()
-    infrared_intrinsics = camera.get_infra_intrinsics()
-    print("RGB intrinsics: \n", rgb_intrinsics)
-    print("Depth intrinsics: \n", depth_intrinsics)
-    print("Infrared intrinsics: \n", infrared_intrinsics)
-
+    infrared_intrinsics = camera.get_infra_intrin
+    
 # TEST2: GET RGB IMAGE. WORKS OK ✓
 
 
 def test2(camera):
     image = camera.get_rgb_image()
-    cv2.imwrite("rgb_image.png", image)
+    script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+    cv2.imwrite(os.path.join(current_location, "rgb_image.png", image))
 
 
 # TEST3: GET DEFAULT DEPTH IMAGE and DATA. WORKS OK ✓

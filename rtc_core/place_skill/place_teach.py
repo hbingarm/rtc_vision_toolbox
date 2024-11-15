@@ -49,7 +49,6 @@ class TeachPlace:
         """
         Collects demonstration data for object placement.
         """
-        breakpoint()
 
         print(f"COLLECTING PLACE DEMONSTRATION DATA FOR {self.object.upper()}")
 
@@ -81,10 +80,10 @@ class TeachPlace:
 
         print("Pulling up action object...")
         pre_placement_pose = np.copy(placement_pose)
-        pre_placement_pose[2, 3] = pre_placement_pose[2,3] + self.config.training.target.pull_distance
-        self.devices.robot_move_to_pose(pre_placement_pose)
+        pre_placement_pose[2, 3] = pre_placement_pose[2, 3] + self.config.training.target.pull_distance
+        self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
         
-        print("Insert the object in hand.")
+        print("Reinsert the object.")
         input("Press Enter when done...")        
         self.devices.gripper_open()
         
@@ -94,7 +93,7 @@ class TeachPlace:
 
         while self.current_demo < self.num_demos:
             
-            print(f"STARTING DEMO {self.current_demo} of {self.num_demos}")
+            print(f"STARTING DEMO {self.current_demo + 1} of {self.num_demos}")
 
             print("####################################################################")
             print(f"DEMO {self.current_demo}: 1. Pre-grasp action object@target")
@@ -145,7 +144,7 @@ class TeachPlace:
                 self.ih_view_pose = ih_camera_view_pose         
                 print("Using new in-hand camera view pose")       
             
-            self.devices.robot_move_to_pose(ih_camera_view_pose)
+            self.devices.robot_move_to_pose_Z_last(ih_camera_view_pose)
             self.collect_data("ih_camera_view0")
             
             current_pose = ih_camera_view_pose
@@ -179,7 +178,7 @@ class TeachPlace:
             print(f"DEMO {self.current_demo}: 4. Gripper close-up view")
             print("####################################################################")
 
-            self.devices.robot_move_to_pose(home_pose)
+            self.devices.robot_move_to_pose_Z_first(home_pose)
 
             print(f"Moving to object in hand close up pose...")
             T_base2camera = self.cam_setup[self.config.training.action.camera]["T_base2cam"]
@@ -192,7 +191,6 @@ class TeachPlace:
 
             self.devices.robot_move_to_pose(gripper_close_up_pose)
             self.collect_data("gripper_close_up_view0")
-            # breakpoint()
             current_pose = T_camera2gripper
             if "view_variations" in self.config.training.action.keys():
                 cfg = self.config.training.action.view_variations
@@ -223,7 +221,7 @@ class TeachPlace:
 
             self.devices.robot_move_to_pose(home_pose)
             print(f"Moving to placement pose...")
-            self.devices.robot_move_to_pose(pre_placement_pose)
+            self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
 
             is_good = input("Is the gripper centered? Press 'n' to place manually (y/n): ")
             if is_good == "n":
@@ -245,7 +243,7 @@ class TeachPlace:
             
             self.current_demo += 1
 
-        self.devices.robot_move_to_pose(home_pose)
+        self.devices.robot_move_to_pose_Z_last(home_pose)
         print("####################################################################")
         print(f"DATA COLLECTION for {self.object.upper()} DONE")
         print("####################################################################")
@@ -276,7 +274,8 @@ class TeachPlace:
         else:
             print(f"{pose_name} found. Reading and moving to pose...")
             pose = np.load(file_path)
-            self.devices.robot_move_to_pose(pose)
+
+            self.devices.robot_move_to_pose_safely(pose)
 
             char = input(
                 f"Press Enter to continue, and 'n' to modify {pose_name}..."

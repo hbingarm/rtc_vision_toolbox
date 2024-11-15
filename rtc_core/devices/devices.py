@@ -99,6 +99,44 @@ class Devices:
             else:
                 return True
         return False
+    
+
+    def robot_move_to_pose_safely(self, pose: np.ndarray, 
+                           max_velocity_scaling_factor=0.3, 
+                           max_acceleration_scaling_factor=0.3) -> None:
+        curr_z = self.robot_get_eef_pose()[2, 3]
+        target_z = pose[2, 3]
+        if curr_z > target_z:
+            self.robot_move_to_pose_Z_last(pose, 
+                           max_velocity_scaling_factor, 
+                           max_acceleration_scaling_factor)
+        else:
+            self.robot_move_to_pose_Z_first(pose, 
+                           max_velocity_scaling_factor, 
+                           max_acceleration_scaling_factor)
+        
+      
+    def robot_move_to_pose_Z_first(self, pose: np.ndarray, 
+                           max_velocity_scaling_factor=0.3, 
+                           max_acceleration_scaling_factor=0.3) -> None:
+        z_first_pos = self.robot_get_eef_pose()
+        z_first_pos[2, 3] = pose[2, 3]
+        self.robot_move_to_pose(z_first_pos, max_velocity_scaling_factor, 
+                                max_acceleration_scaling_factor)
+        self.robot_move_to_pose(pose, max_velocity_scaling_factor,
+                                max_acceleration_scaling_factor)
+    
+    def robot_move_to_pose_Z_last(self, pose: np.ndarray, 
+                           max_velocity_scaling_factor=0.3, 
+                           max_acceleration_scaling_factor=0.3) -> None:
+        curr_z = self.robot_get_eef_pose()[2, 3]
+        first = pose.copy()
+        first[2, 3] = curr_z
+        self.robot_move_to_pose(first, max_velocity_scaling_factor, 
+                                max_acceleration_scaling_factor)
+        self.robot_move_to_pose(pose, max_velocity_scaling_factor,
+                                max_acceleration_scaling_factor)
+
 
     def gripper_open(self) -> None:
         self.__gripper.openGripper()

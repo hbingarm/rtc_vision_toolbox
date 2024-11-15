@@ -50,7 +50,7 @@ class TeachPlace:
         Collects demonstration data for object placement.
         """
 
-        print(f"COLLECTING PLACE DEMONSTRATION DATA FOR {self.object.upper()}")
+        print(f"\n\nCOLLECTING PLACE DEMONSTRATION DATA FOR {self.object.upper()}")
 
         print("####################################################################")
         print("SETUP: 1. GO TO HOME POSE")
@@ -83,8 +83,7 @@ class TeachPlace:
         pre_placement_pose[2, 3] = pre_placement_pose[2, 3] + self.config.training.target.pull_distance
         self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
         
-        print("Reinsert the object.")
-        input("Press Enter when done...")        
+        input("Reinsert the object. Press Enter when done: ")        
         self.devices.gripper_open()
         
         print("####################################################################")
@@ -96,18 +95,18 @@ class TeachPlace:
             print(f"STARTING DEMO {self.current_demo + 1} of {self.num_demos}")
 
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: 1. Pre-grasp action object@target")
+            print(f"DEMO {self.current_demo + 1}: 1. Pre-grasp action object@target")
             print("####################################################################")
 
             print("Move to placement pose.")
-            input("Press Enter to close gripper and continue...")
+            input("Press Enter to close gripper and continue: ")
 
             placement_pose = self.devices.robot_get_eef_pose()
 
             time.sleep(0.5)
 
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: 2. Placement pose (grasp and pull)")
+            print(f"DEMO {self.current_demo + 1}: 2. Placement pose (grasp and pull)")
             print("####################################################################")
 
             print("Closing gripper")
@@ -120,7 +119,7 @@ class TeachPlace:
             self.devices.robot_move_to_pose(pre_placement_pose)
             
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: 3. In-hand camera view")
+            print(f"DEMO {self.current_demo + 1}: 3. In-hand camera view")
             print("####################################################################")
 
             T_eef2camera = self.cam_setup[self.config.training.anchor.camera]["T_eef2cam"]
@@ -175,7 +174,7 @@ class TeachPlace:
                         i -= 1
 
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: 4. Gripper close-up view")
+            print(f"DEMO {self.current_demo + 1}: 4. Gripper close-up view")
             print("####################################################################")
 
             self.devices.robot_move_to_pose_Z_first(home_pose)
@@ -183,8 +182,8 @@ class TeachPlace:
             print(f"Moving to object in hand close up pose...")
             T_base2camera = self.cam_setup[self.config.training.action.camera]["T_base2cam"]
 
-            distance = self.cfg.execution.action.viewing_distance
-            T_camera2gripper = np.asarray(self.cfg.devices.gripper.T_camera2gripper)
+            distance = self.config.execution.action.viewing_distance
+            T_camera2gripper = np.asarray(self.config.devices.gripper.T_camera2gripper)
             T_eef2gripper = np.asarray(self.devices.gripper.T_ee2gripper)
             T_base2gripper = (T_base2camera @ T_camera2gripper) @ np.linalg.inv(T_eef2gripper)
             gripper_close_up_pose = T_base2gripper
@@ -216,29 +215,29 @@ class TeachPlace:
                         i -= 1
 
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: 5. Assemble it Back")
+            print(f"DEMO {self.current_demo + 1}: 5. Assemble it Back")
             print("####################################################################")
 
             self.devices.robot_move_to_pose(home_pose)
             print(f"Moving to placement pose...")
             self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
 
-            is_good = input("Is the gripper centered? Press 'n' to place manually (y/n): ")
+            is_good = input("Is the gripper centered? 'n' to place manually [Y/n]: ")
             if is_good == "n":
-                input("Jog robot to placement pose and press Enter to continue...")
+                input("Jog robot to placement pose and press Enter to continue: ")
                 self.current_demo -= 1
-            elif is_good == "y":
+            elif is_good == "y" or is_good == "" or is_good == "Y":
                 self.devices.robot_move_to_pose(placement_pose)
             else:
                 print("Invalid input. Assuming 'n'...")
-                input("Jog robot to placement pose and press Enter to continue...")
+                input("Jog robot to placement pose and press Enter to continue: ")
             
             self.collect_data("placement")
             
             self.devices.gripper_open()
 
             print("####################################################################")
-            print(f"DEMO {self.current_demo}: DONE")
+            print(f"DEMO {self.current_demo + 1}: DONE")
             print("####################################################################")
             
             self.current_demo += 1
@@ -266,7 +265,7 @@ class TeachPlace:
         file_path = os.path.join(poses_folder, f"{pose_name}.npy")
         if not os.path.exists(file_path):
             print(f"No {pose_name} found. Show me!")
-            input(f"Move robot to {pose_name} and press Enter to save...")
+            input(f"Move robot to {pose_name} and press Enter to save: ")
             pose = self.devices.robot_get_eef_pose()
 
             if pose_name not in ["placement_pose", "pre_placement_pose"]:
@@ -278,10 +277,10 @@ class TeachPlace:
             self.devices.robot_move_to_pose_safely(pose)
 
             char = input(
-                f"Press Enter to continue, and 'n' to modify {pose_name}..."
+                f"Press Enter to continue, and 'n' to modify {pose_name}: "
             )
             if char == "n":
-                input(f"Move robot to {pose_name} and press Enter to save...")
+                input(f"Move robot to {pose_name} and press Enter to save: ")
                 pose = self.devices.robot_get_eef_pose()
                 np.save(file_path, pose)
 

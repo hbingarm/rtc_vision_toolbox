@@ -1,3 +1,4 @@
+import os
 import argparse
 import base64
 import math
@@ -625,7 +626,8 @@ class ZedRos:
 
         args = self.__get_default_IGEV_args()        
         model = torch.nn.DataParallel(IGEVStereo(args), device_ids=[0])
-        model.load_state_dict(torch.load(args.restore_ckpt))
+        current_location = os.path.realpath(__file__)
+        model.load_state_dict(torch.load(os.path.join(current_location, args.restore_ckpt))
         model = model.module
         model.to('cuda')
         model.eval()
@@ -786,7 +788,7 @@ class ZedRos:
         # args = parser.parse_args()
         
         class args:
-            restore_ckpt = '/home/mfi/repos/rtc_vision_toolbox/camera/zed_ros/IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'
+            restore_ckpt = '../IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'  # relative to zed_pos.py
             save_numpy = False
             left_imgs = "./demo-imgs/*/im0.png"
             right_imgs = "./demo-imgs/*/im1.png"

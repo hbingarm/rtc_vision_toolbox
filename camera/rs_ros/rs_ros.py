@@ -146,6 +146,7 @@ class RsRos:
             method = self.__depth_mode
 
         depth_data = self.get_raw_depth_data(max_depth=max_depth, method=method, use_new_frame=use_new_frame)
+        depth_data = depth_data.astype(np.float64)
 
         depth_image = cv2.normalize(depth_data, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 
@@ -170,6 +171,8 @@ class RsRos:
             method = self.__depth_mode
 
         depth_image = self.get_raw_depth_data(method=method, use_new_frame=use_new_frame)        
+        depth_image = depth_image.astype(np.float64)
+
         depth_image = np.where((depth_image > min_depth) & (depth_image < max_depth),
                             depth_image, 0)
         depth_image = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
@@ -673,17 +676,13 @@ class RsRos:
             image1, image2 = padder.pad(image1, image2)
             start = time.time()
 
-            igev_disp, disp_prob = model(image1, image2, iters=32, test_mode=True)
+            igev_disp = model(image1, image2, iters=32, test_mode=True)
             end = time.time()
             if self.debug:
                 print("torch inference time: ", end - start)
             igev_disp = igev_disp.cpu().numpy()
             igev_disp = padder.unpad(igev_disp)
             igev_disp = igev_disp.squeeze()
-            disp_prob = disp_prob.cpu().numpy()
-            disp_prob = padder.unpad(disp_prob)
-            disp_prob = disp_prob.squeeze()
-            disp_prob = np.float32( disp_prob / 4 )
             
             igev_disp = np.float32( igev_disp )    
             
@@ -691,12 +690,9 @@ class RsRos:
             # igev_disp[disp_prob < 0.5] = 0
             igev_disp[np.where(igev_disp == 0)] = None      
             igev_disp[np.where(igev_disp == float('inf'))] = None
-            
-            np.save("disp_prob.npy", disp_prob)
-            
+                      
             if self.debug:
                 print("::::::IGEV estimation finished::::::")
-                print("disp_prob: ", disp_prob.shape)
                 print("IGEV disp shape: ", igev_disp.shape)
 
             return igev_disp
@@ -745,7 +741,7 @@ class RsRos:
             
             if len(new_points) == 0:
                 new_points = points        
-            
+            # breakpoint()
             points = np.array(new_points)
             pcd = o3d.geometry.PointCloud()
             pcd.points = o3d.utility.Vector3dVector(points)
@@ -819,7 +815,7 @@ class RsRos:
         # args = parser.parse_args()
         
         class args:
-            restore_ckpt = '/home/mfi/repos/rtc_vision_toolbox/camera/zed_ros/IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'
+            restore_ckpt = '/home/rtc-demo/rtc_repos/rtc_vision_toolbox/camera/zed_ros/IGEV/IGEV-Stereo/pretrained_models/middlebury/middlebury.pth'
             save_numpy = False
             left_imgs = "./demo-imgs/*/im0.png"
             right_imgs = "./demo-imgs/*/im1.png"

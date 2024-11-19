@@ -116,7 +116,7 @@ class ExecutePlace:
         self.devices.gripper_open()
         time.sleep(0.5)
 
-        input("Press Enter to close gripper when object inside gripper...")
+        input("Press Enter to close gripper when object inside gripper: ")
 
         self.devices.gripper_close()
         time.sleep(0.5)
@@ -137,7 +137,7 @@ class ExecutePlace:
                 [0, -1,  0, 0],
                 [0,  0, -1, distance],
                 [0,  0,  0, 1]])
-            T_eef2gripper = np.asarray(self.devices.gripper.T_ee2gripper)
+            T_eef2gripper = np.asarray(self.cfg.devices.gripper.T_ee2gripper)
             T_base2gripper = (T_base2camera @ T_camera2gripper) @ np.linalg.inv(T_eef2gripper)
             gripper_close_up_pose = T_base2gripper
 
@@ -175,11 +175,11 @@ class ExecutePlace:
             pre_target_pose[2, 3] = self.poses['home_pose'][2, 3]
             self.devices.robot_move_to_pose(pre_target_pose, 1, 1)
             
-            input("Press Enter to continue...")
+            input("Press Enter to continue: ")
             
             self.devices.robot_move_to_pose(pre_placement_pose, 1, 1)
         
-            retry_input = input("Press 'r' to retry or Enter to continue...")
+            retry_input = input("Press 'r' to retry or Enter to continue: ")
             retry = retry_input == 'r'
             if retry:
                 retry_ctr += 1
@@ -188,7 +188,7 @@ class ExecutePlace:
                     os.makedirs(self.save_dir)
                     print(f"Save directory: {self.save_dir}")
             
-        self.devices.robot_move_to_pose(placement_pose, 0.05, 0.05)
+        # self.devices.robot_move_to_pose(placement_pose, 0.05, 0.05)
         
         print("####################################################################")
         print("7. FINISHING UP")
@@ -202,7 +202,7 @@ class ExecutePlace:
 
     def infer_placement_pose(self) -> np.ndarray:
         
-        T_ee2target = np.asarray(self.devices.gripper.T_ee2gripper)
+        T_ee2target = np.asarray(self.cfg.devices.gripper.T_ee2gripper)
 
         # PREPARE DATA FOR INFERENCE: ACTION POINTCLOUD
         action_pcd = self.predict_placement_pose_data['action']['pcd']
@@ -540,8 +540,12 @@ class ExecutePlace:
             T_base2camera = self.cam_setup[self.cfg.training.action.camera]["T_base2cam"]
 
             distance = self.cfg.execution.action.viewing_distance
-            T_camera2gripper = np.asarray(self.cfg.devices.gripper.T_camera2gripper)
-            T_eef2gripper = np.asarray(self.devices.gripper.T_ee2gripper)
+            T_camera2gripper = np.array([
+                [1,  0,  0, 0],
+                [0, -1,  0, 0],
+                [0,  0, -1, distance],
+                [0,  0,  0, 1]]) 
+            T_eef2gripper = np.asarray(self.cfg.devices.gripper.T_ee2gripper)
             T_base2gripper = (T_base2camera @ T_camera2gripper) @ np.linalg.inv(T_eef2gripper)
             gripper_close_up_pose = T_base2gripper
 

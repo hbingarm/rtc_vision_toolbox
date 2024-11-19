@@ -1,7 +1,7 @@
 import argparse
 from calibration.calibrations import *
 from calibration.marker.aruco_marker import ArucoMarker
-from camera.orbbec.ob_camera import OBCamera
+# from camera.orbbec.ob_camera import OBCamera
 from camera.zed_ros.zed_ros import ZedRos
 from robot.ros_robot.ros_robot import ROSRobot
 
@@ -20,7 +20,9 @@ def robot_camera_calibration():
     print("MARKER INITIALIZED")
     print("=====================================")
 
-    robot = ROSRobot(robot_name='yk_builder', rosmaster_ip='172.26.179.142')
+    robot_name = input("Enter robot namespace: ")
+    rosmaster_ip = input("Enter rosmaster IP: ")
+    robot = ROSRobot(robot_name=robot_name, rosmaster_ip=rosmaster_ip)
 
     print("=====================================")
     print("ROBOT INITIALIZED")

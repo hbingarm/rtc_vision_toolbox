@@ -26,7 +26,9 @@ def robot_camera_calibration():
     print("MARKER INITIALIZED")
     print("=====================================")
 
-    robot = ROSRobot(robot_name='yk_builder', rosmaster_ip='172.26.179.142')
+    robot_name = input("Enter robot namespace: ")
+    rosmaster_ip = input("Enter rosmaster IP: ")
+    robot = ROSRobot(robot_name=robot_name, rosmaster_ip=rosmaster_ip)
 
     print("=====================================")
     print("ROBOT INITIALIZED")

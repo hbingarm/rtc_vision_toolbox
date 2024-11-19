@@ -74,17 +74,17 @@ class TeachPlace:
         print("SETUP: 3. PULL UP AND INSERT AGAIN")
         print("####################################################################")
 
-        print("Closing gripper")
-        self.devices.gripper_close()
-        time.sleep(0.5)
+        # print("Closing gripper")
+        # self.devices.gripper_close()
+        # time.sleep(0.5)
 
-        print("Pulling up action object...")
-        pre_placement_pose = np.copy(placement_pose)
-        pre_placement_pose[2, 3] = pre_placement_pose[2, 3] + self.config.training.target.pull_distance
-        self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
+        # print("Pulling up action object...")
+        # pre_placement_pose = np.copy(placement_pose)
+        # pre_placement_pose[2, 3] = pre_placement_pose[2, 3] + self.config.training.target.pull_distance
+        # self.devices.robot_move_to_pose_Z_last(pre_placement_pose)
         
-        input("Reinsert the object. Press Enter when done: ")        
-        self.devices.gripper_open()
+        # input("Reinsert the object. Press Enter when done: ")        
+        # self.devices.gripper_open()
         
         print("####################################################################")
         print("SETUP DONE")
@@ -183,14 +183,18 @@ class TeachPlace:
             T_base2camera = self.cam_setup[self.config.training.action.camera]["T_base2cam"]
 
             distance = self.config.execution.action.viewing_distance
-            T_camera2gripper = np.asarray(self.config.devices.gripper.T_camera2gripper)
-            T_eef2gripper = np.asarray(self.devices.gripper.T_ee2gripper)
+            T_camera2gripper = np.array([
+                [1,  0,  0, 0],
+                [0, -1,  0, 0],
+                [0,  0, -1, distance],
+                [0,  0,  0, 1]])            
+            T_eef2gripper = np.asarray(self.config.devices.gripper.T_ee2gripper)
             T_base2gripper = (T_base2camera @ T_camera2gripper) @ np.linalg.inv(T_eef2gripper)
             gripper_close_up_pose = T_base2gripper
 
             self.devices.robot_move_to_pose(gripper_close_up_pose)
             self.collect_data("gripper_close_up_view0")
-            current_pose = T_camera2gripper
+            current_pose = T_base2gripper
             if "view_variations" in self.config.training.action.keys():
                 cfg = self.config.training.action.view_variations
                 for i in range(cfg['count'] - 1):
@@ -325,7 +329,7 @@ class TeachPlace:
 
             # save pcd data in folder
             o3d.io.write_point_cloud(os.path.join(
-                    pcd_folder, f"demo{self.current_demo}_{robot_state}_pointcloud.ply"), point_cloud,)
+                    pcd_folder, f"demo{self.current_demo}_{robot_state}_{cam_name}_pointcloud.ply"), point_cloud,)
 
         # Collect data from robot
         eef_pose = self.devices.robot_get_eef_pose()
